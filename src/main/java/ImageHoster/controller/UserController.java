@@ -46,15 +46,12 @@ public class UserController {
         String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
 
         String pwd = user.getPassword();
-        Pattern pattern_alpha =  Pattern.compile("[a-zA-Z]");
-        Pattern pattern_spl = Pattern.compile("[^a-zA-Z0-9]");
-        Pattern pattern_num = Pattern.compile("[0-9]");
-        Matcher matcher_spl = pattern_spl.matcher(pwd);
-        Matcher matcher_alpha = pattern_alpha.matcher(pwd);
-        Matcher matcher_num = pattern_num.matcher(pwd);
 
-        if (! (matcher_spl.find() && matcher_alpha.find() && matcher_num.find())){
-
+        if (validatePassword(pwd)){
+            userService.registerUser(user);
+            return "users/login";
+        }
+        else{
             user = new User();
             UserProfile profile = new UserProfile();
             user.setProfile(profile);
@@ -62,9 +59,6 @@ public class UserController {
             model.addAttribute("passwordTypeError" , error);
             return "users/registration";
         }
-
-        userService.registerUser(user);
-        return "users/login";
     }
 
     //This controller method is called when the request pattern is of type 'users/login'
@@ -100,5 +94,18 @@ public class UserController {
         List<Image> images = imageService.getAllImages();
         model.addAttribute("images", images);
         return "index";
+    }
+
+    public boolean validatePassword(String passwd){
+        Pattern pattern_alpha =  Pattern.compile("[a-zA-Z]");
+        Pattern pattern_spl = Pattern.compile("[^a-zA-Z0-9]");
+        Pattern pattern_num = Pattern.compile("[0-9]");
+        Matcher matcher_spl = pattern_spl.matcher(passwd);
+        Matcher matcher_alpha = pattern_alpha.matcher(passwd);
+        Matcher matcher_num = pattern_num.matcher(passwd);
+        if (matcher_spl.find() && matcher_alpha.find() && matcher_num.find()){
+            return true;
+        }
+        else {return false;}
     }
 }
